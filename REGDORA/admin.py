@@ -5,6 +5,13 @@ from django.contrib import admin
 from django.contrib import admin
 from .models import ThirdPartyVendor_B1_01_01
 
+from django.contrib import admin
+
+# admin.site.site_header = "Banca Mediolanum (login)"  # Title on the login page
+# admin.site.site_title = "Registro DORA"  # Title on the browser tab
+# admin.site.index_title = "Registro DORA"  # Title on the admin index page
+
+
 @admin.register(ThirdPartyVendor_B1_01_01)
 class ThirdPartyVendorAdmin(admin.ModelAdmin):
     list_display = ('lei', 'entity_name', 'country_code', 'entity_type')
