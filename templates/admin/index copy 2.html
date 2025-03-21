@@ -1,0 +1,123 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<div id="content-main">
+
+    <!-- Section 1: Entities -->
+    <div class="module">
+        <table>
+            <caption>1 - Entities</caption>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_thirdpartyvendor_b1_01_01_changelist' %}">B_01.01 - Entità che mantiene il registro delle informazioni</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_financialentity_b1_02_changelist' %}">B_01.02 - Elenco delle entità incluse nell'ambito del consolidamento</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_branch_b1_03_changelist' %}">B_01.03 - Elenco delle succursali</a></th>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 2: Agreements & Contracts -->
+    <div class="module">
+        <table>
+            <caption>2 - AGREEMENTS & CONTRACTS</caption>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_contractagreement_b2_01_changelist' %}">B_02.01 - Accordi contrattuali - informazioni generali</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_contractagreementdetails_b2_02_changelist' %}">B_02.02 - Accordi contrattuali - informazioni specifiche</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_intragroupcontractagreement_b2_03_changelist' %}">B_02.03 - Elenco degli accordi contrattuali intragruppo</a></th>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 3: Servizi -->
+    <div class="module">
+        <table>
+            <caption>3 - SERVIZI</caption>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_contractsigningentity_b3_01_changelist' %}">B_03.01 - Entità che firmano gli accordi contrattuali per ricevere il servizio o i servizi TIC</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_thirdpartyvendorsigning_b3_02_changelist' %}">B_03.02 - Fornitori terzi di servizi TIC che firmano gli accordi contrattuali per la prestazione del servizio o dei servizi TIC</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_financialentityserviceprovider_b3_03_changelist' %}">B_03.03 - Entità che firmano gli accordi contrattuali per la prestazione del servizio o dei servizi TIC ad altre entità incluse nell'ambito del consolidamento</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_financialentityserviceusage_b4_01_changelist' %}">B_04.01 - Entità che si avvalgono dei servizi TIC</a></th>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 4: Fornitori -->
+    <div class="module">
+        <table>
+            <caption>4 - FORNITORI</caption>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_thirdpartyvendor_b5_01_changelist' %}">B_05.01 - Fornitori terzi di servizi TIC</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_supplychain_b5_02_changelist' %}">B_05.02 - Catena di approvvigionamento dei servizi TIC</a></th>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 5: Funzioni e Processi -->
+    <div class="module">
+        <table>
+            <caption>5 - FUNZIONI E PROCESSI</caption>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_functionidentification_b6_01_changelist' %}">B_06.01 - Identificazione delle funzioni</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_serviceevaluation_b7_01_changelist' %}">B_07.01 - Valutazioni dei servizi TIC</a></th>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 6: Supporto -->
+    <div class="module">
+        <table>
+            <caption>6 - TABELLE DI SUPPORTO E RIFERIMENTO</caption>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_type_of_financial_entity_changelist' %}">Type_of_financial_entity</a></th>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 7: Administration -->
+    <div class="module">
+        <table>
+            <caption>7 - ADMINISTRATION</caption>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:auth_user_changelist' %}">Users</a></th>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:auth_group_changelist' %}">Groups</a></th>
+                <td>&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% endblock %}

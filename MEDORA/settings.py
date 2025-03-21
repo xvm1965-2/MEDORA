@@ -55,7 +55,8 @@ ROOT_URLCONF = "MEDORA.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        # "DIRS": [],
+        'DIRS': [BASE_DIR / 'templates'],  # Add this line
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
