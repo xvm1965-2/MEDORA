@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="custom-login">
+    <h2>DORA Banca Mediolanum</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+    <style>
+        .custom-login {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            width: 300px;
+            margin: auto;
+        }
+        button { background: #004080; color: white; padding: 10px 20px; border: none; }
+    </style>
+{% endblock %}
