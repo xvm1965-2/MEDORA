@@ -1,28 +1,81 @@
 from django.contrib import admin
-
-# Register your models here.
-
-from django.contrib import admin
-from .models import ThirdPartyVendor_B1_01_01
-
-from django.contrib import admin
+from .utils import get_clean_verbose_name
 
 # admin.site.site_header = "Banca Mediolanum (login)"  # Title on the login page
 # admin.site.site_title = "Registro DORA"  # Title on the browser tab
 # admin.site.index_title = "Registro DORA"  # Title on the admin index page
-
 
 class CustomAdmin(admin.ModelAdmin):
     class Media:
         css = {'all': ('css/admin_custom.css',)}
         js = ['js/admin_tooltips.js']
 
+class CleanHeaderMixin:
+    """
+    Mixin-only version that can be combined with any admin class
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Create mapping of original field names to display methods
+        field_map = {}
+        new_display = []
+        
+        for field_name in self.list_display:
+            if hasattr(self.model, field_name):
+                field = self.model._meta.get_field(field_name)
+                display_name = f'display_{field_name}'
+                
+                if not hasattr(self, display_name):
+                    def make_display_func(fn):
+                        def display_func(obj):
+                            return str(getattr(obj, fn))
+                        return display_func
+                    
+                    setattr(self, display_name, make_display_func(field_name))
+                    getattr(self, display_name).short_description = \
+                        field.verbose_name.split('(')[0].strip() if '(' in field.verbose_name else field.verbose_name
+                
+                field_map[field_name] = display_name
+                new_display.append(display_name)
+            else:
+                new_display.append(field_name)
+        
+        # Update list_display
+        self.list_display = tuple(new_display)
+        
+        # Update list_display_links to use display methods
+        if self.list_display_links:
+            new_links = []
+            for link in self.list_display_links:
+                if link in field_map:
+                    new_links.append(field_map[link])
+                else:
+                    new_links.append(link)
+            self.list_display_links = tuple(new_links)
+        elif self.list_display:
+            first_field = self.list_display[0]
+            if first_field.startswith('display_'):
+                # If first item is one of our display methods
+                self.list_display_links = (first_field,)
+            else:
+                # Find the original field name
+                for orig_name, display_name in field_map.items():
+                    if display_name == first_field:
+                        self.list_display_links = (display_name,)
+                        break
+                else:
+                    self.list_display_links = (first_field,)
+
+
+from .models import ThirdPartyVendor_B1_01_01
 @admin.register(ThirdPartyVendor_B1_01_01)
-class ThirdPartyVendorAdmin(CustomAdmin):
-    list_display = ('lei', 'entity_name', 'country_code', 'entity_type')
+class ThirdPartyVendorAdmin(CleanHeaderMixin, CustomAdmin):
+    list_display = ('lei', 'entity_name', 'entity_type')
     # search_fields = ('lei', 'entity_name')
     # list_filter = ('entity_type', 'country_code')
-
+    
+    
 
 
 from .models import FinancialEntity_B1_02
