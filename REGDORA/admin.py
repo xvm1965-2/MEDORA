@@ -15,6 +15,7 @@ from django.contrib import admin
 class CustomAdmin(admin.ModelAdmin):
     class Media:
         css = {'all': ('css/admin_custom.css',)}
+        js = ['js/admin_tooltips.js']
 
 @admin.register(ThirdPartyVendor_B1_01_01)
 class ThirdPartyVendorAdmin(CustomAdmin):

@@ -1,5 +1,79 @@
-/* Submit row layout */
-.submit-row {
+/* ===== FIELD LAYOUT ===== */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  
+  .field-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  .field-label {
+    flex: 0 0 200px;
+    padding-right: 20px;
+    padding-top: 5px;
+    font-weight: bold;
+  }
+  
+  .field-input {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  /* ===== INPUT ELEMENTS ===== */
+  .field-input input:not([type="checkbox"]),
+  .field-input textarea {
+    flex: 1;
+    min-width: 0;
+    order: 1;
+  }
+  
+  .field-input select {
+    width: auto;
+    max-width: 100%;
+    order: 1;
+  }
+  
+  /* ===== HELP ICON ===== */
+  .field-input .help-icon {
+    order: 2;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 8px;
+    background: #417690;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 16px;
+    font-size: 12px;
+    font-style: italic;
+    cursor: help;
+    flex-shrink: 0;
+  }
+  
+  /* ===== CHECKBOXES ===== */
+  .field-wrapper .field-label input[type="checkbox"] {
+    margin-right: 5px;
+  }
+  
+  /* ===== DATE/TIME FIELDS ===== */
+  .field-input .datetime {
+    display: flex;
+    gap: 8px;
+    order: 1;
+  }
+  
+  /* ===== SUBMIT BUTTONS ===== */
+  .submit-row {
     display: flex;
     justify-content: space-between;
     padding: 10px;
@@ -7,26 +81,24 @@
     border-top: 1px solid #eee;
     flex-wrap: wrap;
     gap: 10px;
-}
-
-/* Button containers */
-.save-buttons {
+  }
+  
+  .save-buttons {
     display: flex;
     gap: 10px;
     order: 1;
-}
-
-.action-buttons {
+  }
+  
+  .action-buttons {
     display: flex;
     gap: 10px;
     order: 2;
-    margin-left: auto; /* Pushes to right */
-}
-
-/* Base button styles */
-.submit-row input[type="submit"],
-.submit-row a.deletelink,
-.submit-row a.cancel-link {
+    margin-left: auto;
+  }
+  
+  .submit-row input[type="submit"],
+  .submit-row a.deletelink,
+  .submit-row a.cancel-link {
     padding: 8px 15px;
     border-radius: 4px;
     color: white;
@@ -35,24 +107,38 @@
     border: none;
     cursor: pointer;
     white-space: nowrap;
-}
-
-/* Specific button colors */
-.submit-row input[type="submit"] { background: #417690; }
-.submit-row a.deletelink { background: #ba2121; }
-.submit-row a.cancel-link { background: #999; }
-
-/* Hover states */
-.submit-row input[type="submit"]:hover { background: #205067; }
-.submit-row a.deletelink:hover { background: #8a1a1a; }
-.submit-row a.cancel-link:hover { background: #747474; }
-
-/* Responsive layout */
-@media (max-width: 768px) {
+  }
+  
+  .submit-row input[type="submit"] { background: #417690; }
+  .submit-row a.deletelink { background: #ba2121; }
+  .submit-row a.cancel-link { background: #999; }
+  
+  .submit-row input[type="submit"]:hover { background: #205067; }
+  .submit-row a.deletelink:hover { background: #8a1a1a; }
+  .submit-row a.cancel-link:hover { background: #747474; }
+  
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .field-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .field-label {
+      flex: 1 0 100%;
+      padding-right: 0;
+      margin-bottom: 5px;
+    }
+    
+    .field-input {
+      flex: 1 0 100%;
+    }
+    
     .submit-row {
-        flex-direction: column;
+      flex-direction: column;
     }
+    
     .action-buttons {
-        margin-left: 0;
+      margin-left: 0;
     }
-}
+  }

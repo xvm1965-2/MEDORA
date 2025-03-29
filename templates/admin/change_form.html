@@ -5,3 +5,13 @@
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/admin_custom.css' %}">
 {% endblock %}
+
+{% block field_sets %}
+{% for fieldset in adminform %}
+  {% include "admin/includes/fieldset.html" with show_help_icon=True %}
+{% endfor %}
+{% endblock %}
+
+{% block after_field_sets %}
+<script src="{% static 'js/admin_tooltips.js' %}"></script>
+{% endblock %}

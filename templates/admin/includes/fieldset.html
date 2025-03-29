@@ -1,0 +1,36 @@
+{% load i18n admin_urls admin_modify %}
+<fieldset class="module aligned {{ fieldset.classes }}">
+  {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+  {% if fieldset.description %}
+    <div class="description">{{ fieldset.description|safe }}</div>
+  {% endif %}
+  {% for line in fieldset %}
+    <div class="form-row{% if line.fields|length == 1 and line.errors %} errors{% endif %}{% for field in line %} {{ field.field.name }}{% endfor %}">
+      {% if line.fields|length == 1 %}{{ line.errors }}{% endif %}
+      {% for field in line %}
+        <div class="field-wrapper{% if line.fields|length != 1 %} multi-field{% endif %}">
+          <div class="field-label">
+            {% if field.is_checkbox %}
+              {{ field.field }}{{ field.label_tag }}
+            {% else %}
+              {{ field.label_tag }}
+            {% endif %}
+          </div>
+          <div class="field-input">
+            {% if field.is_readonly %}
+              <div class="readonly">{{ field.contents }}</div>
+            {% else %}
+              {{ field.field }}
+              {% if show_help_icon and field.field.help_text %}
+                <span class="help-icon" title="{{ field.field.help_text|escape }}">(i)</span>
+              {% endif %}
+            {% endif %}
+            {% if not show_help_icon and field.field.help_text %}
+              <div class="help">{{ field.field.help_text|safe }}</div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</fieldset>
