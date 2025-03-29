@@ -36,6 +36,11 @@ class TypeOfFinancialEntityAdmin(admin.ModelAdmin):
     list_display = ('code', 'description')
     search_fields = ('code', 'description')
 
+from .models import Currency
+@admin.register(Currency)
+class CurrencyAdmin(admin.ModelAdmin):
+    list_display = ('name', 'symbol', 'numeric_code')
+    
 from .models import Branch_B1_03
 @admin.register(Branch_B1_03)
 class BranchAdmin(admin.ModelAdmin):

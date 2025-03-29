@@ -1,0 +1,23 @@
+/* Background color for the entire page */
+body {
+    background-color: #dde9ed03;
+}
+
+/* Styling the admin header */
+#header {
+    background-color: #81b2e2;
+    color: rgb(211, 228, 29);
+}
+
+/* Customizing the site name */
+#site-name a {
+    color: rgba(5, 1, 19, 0.488);
+    font-weight: bold;
+}
+
+/* Ensure logo aligns well */
+#site-name img {
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 10px;
+}

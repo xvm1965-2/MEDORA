@@ -1,4 +1,5 @@
 from django.db import models
+from django_countries.fields import CountryField
 
 # Model for storing financial entity types
 class Type_of_financial_entity(models.Model):
@@ -20,12 +21,27 @@ class Type_of_financial_entity(models.Model):
         verbose_name = "Type of Financial Entity"
         verbose_name_plural = "Types of Financial Entities"
 
+class Currency(models.Model):
+    code = models.CharField(max_length=3, primary_key=True, verbose_name="ISO 4217 Code")
+    name = models.CharField(max_length=50, verbose_name="Currency Name")
+    symbol = models.CharField(max_length=5, blank=True, null=True)
+    numeric_code = models.PositiveSmallIntegerField(verbose_name="Numeric Code")
+    
+    class Meta:
+        verbose_name = "Currency"
+        verbose_name_plural = "Currencies"
+        ordering = ['code']
+    
+    def __str__(self):
+        return f"{self.code} - {self.name}"
+
+
 
 class ThirdPartyVendor_B1_01_01(models.Model):
     # B_01.01.0010: LEI of the financial entity
     lei = models.CharField(
         max_length=20,
-        verbose_name="LEI dell'entità finanziaria",
+        verbose_name="B_01.01.0010\nLEI dell'entità finanziaria",
         help_text="Identificare l'entità finanziaria che mantiene e aggiorna il registro delle informazioni utilizzando il LEI, codice alfanumerico di 20 caratteri conforme alla norma ISO 17442.",
         unique=True,
     )
@@ -33,29 +49,31 @@ class ThirdPartyVendor_B1_01_01(models.Model):
     # B_01.01.0020: Name of the financial entity
     entity_name = models.CharField(
         max_length=255,
-        verbose_name="Nome dell'entità finanziaria",
+        verbose_name="B_01.01.0020\nNome dell'entità finanziaria",
         help_text="Denominazione legale dell'entità finanziaria che mantiene e aggiorna il registro delle informazioni.",
     )
 
     # B_01.01.0030: Country of the financial entity
-    country_code = models.CharField(
-        max_length=2,
-        verbose_name="Paese dell'entità finanziaria",
+    country_code = CountryField(
+        verbose_name="B_01.01.0030\nPaese dell'entità finanziaria",
         help_text="Indicare il codice ISO 3166-1 alpha-2 del paese in cui è stata rilasciata l'autorizzazione o è stata effettuata la registrazione dell'entità segnalata nel registro delle informazioni.",
+        default='IT',  # Italy as default
+        blank=False,   # Makes the field mandatory
+        null=False     # DB-level enforcement
     )
 
     # B_01.01.0040: Type of financial entity
     entity_type = models.ForeignKey(
         Type_of_financial_entity,
         on_delete=models.PROTECT,
-        verbose_name="Tipo di entità finanziaria",
+        verbose_name="B_01.01.0040\nTipo di entità finanziaria",
         help_text="Identificare il tipo di entità finanziaria utilizzando una delle opzioni presenti nell'elenco chiuso.",
     )
 
     # B_01.01.0050: Competent authority
     competent_authority = models.CharField(
         max_length=255,
-        verbose_name="Autorità competente",
+        verbose_name="B_01.01.0050\nAutorità competente",
         help_text="Identificare l'autorità competente di cui all'articolo 46 del regolamento (UE) 2022/2554, a disposizione della quale è messo il registro delle informazioni.",
         blank=True,
         null=True,
@@ -63,7 +81,7 @@ class ThirdPartyVendor_B1_01_01(models.Model):
 
     # B_01.01.0060: Date of availability
     availability_date = models.DateField(
-        verbose_name="Data della messa a disposizione",
+        verbose_name="B_01.01.0060\nData della messa a disposizione",
         help_text="Indicare la data utilizzando il codice ISO 8601 (aaaa-mm-gg) della data di messa a disposizione.",
         blank=True,
         null=True,
@@ -94,11 +112,14 @@ class FinancialEntity_B1_02(models.Model):
         help_text="Denominazione legale dell'entità finanziaria segnalata nel registro delle informazioni.",
     )
 
-    # B_01.02.0030: Country of the financial entity
-    country_code = models.CharField(
-        max_length=2,
-        verbose_name="Paese dell'entità finanziaria",
-        help_text="Indicare il codice ISO 3166-1 alpha-2 del paese in cui è stata rilasciata l'autorizzazione o è stata effettuata la registrazione dell'entità finanziaria segnalata nel registro delle informazioni.",
+   
+   # B_01.02.0030: Country of the financial entity
+    country_code = CountryField(
+        verbose_name="B_01.02.0030\nPaese dell'entità finanziaria",
+        help_text="Indicare il codice ISO 3166-1 alpha-2 del paese in cui è stata rilasciata l'autorizzazione o è stata effettuata la registrazione dell'entità segnalata nel registro delle informazioni.",
+        default='IT',  # Italy as default
+        blank=False,   # Makes the field mandatory
+        null=False     # DB-level enforcement
     )
 
     # B_01.02.0040: Type of financial entity
@@ -155,13 +176,18 @@ class FinancialEntity_B1_02(models.Model):
     )
 
     # B_01.02.0100: Currency
-    currency = models.CharField(
-        max_length=3,
-        verbose_name="Valuta",
-        help_text="Indicare il codice alfabetico ISO 4217 della valuta utilizzata per la preparazione del bilancio d'esercizio dell'entità finanziaria.",
+    currency = models.ForeignKey(
+        'Currency',  # or your_app.Currency if in different app
+        on_delete=models.PROTECT,
+        verbose_name="B_01.02.0100\nValuta",
+        help_text="Indicare il codice alfabetico ISO 4217 della valuta...",
+        default="EUR",
         blank=True,
         null=True,
-    )
+        related_name='financial_entities'  
+)
+
+
 
     # B_01.02.0110: Total assets value
     total_assets = models.DecimalField(
@@ -256,11 +282,17 @@ class ContractAgreement_B2_01(models.Model):
     )
 
     # B_02.01.0040: Valuta dell'importo segnalato in B_02.01.0050
-    currency = models.CharField(
-        max_length=3,
+    currency = models.ForeignKey(
+        'Currency',  # or your_app.Currency if in different app
+        on_delete=models.PROTECT,
         verbose_name="Valuta dell'importo segnalato",
-        help_text="Indicare il codice alfabetico ISO 4217 della valuta utilizzata.",
+        help_text="Indicare il codice alfabetico ISO 4217 della valuta...",
+        default="EUR",
+        blank=True,
+        null=True,
+        related_name='ContractAgreement'  # optional
     )
+
 
     # B_02.01.0050: Spese o costi stimati annuali dell'accordo contrattuale per l'anno passato
     estimated_annual_cost = models.DecimalField(
@@ -697,13 +729,18 @@ class ThirdPartyVendor_B5_01(models.Model):
     )
 
     # B_05.01.0090: Valuta dell'importo segnalato in B_05.01.0100
-    currency = models.CharField(
-        max_length=3,
+    currency = models.ForeignKey(
+        'Currency',  # or your_app.Currency if in different app
+        on_delete=models.PROTECT,
         verbose_name="Valuta dell'importo segnalato",
-        help_text="Indicare il codice alfabetico ISO 4217 della valuta utilizzata per esprimere l'importo in B_05.01.0100.",
+        help_text="Indicare il codice alfabetico ISO 4217 della valuta...",
+        default="EUR",
         blank=True,
         null=True,
+        related_name='ThirdPartyVendor'  # optional
     )
+
+
 
     # B_05.01.0100: Spese o costi stimati annuali totali del fornitore terzo di servizi TIC
     estimated_annual_cost = models.DecimalField(
