@@ -1,5 +1,7 @@
 from django.contrib import admin
+from django.db import models
 from .utils import get_clean_verbose_name
+from django.forms import DateInput
 
 # admin.site.site_header = "Banca Mediolanum (login)"  # Title on the login page
 # admin.site.site_title = "Registro DORA"  # Title on the browser tab
@@ -9,7 +11,9 @@ class CustomAdmin(admin.ModelAdmin):
     class Media:
         css = {'all': ('css/admin_custom.css',)}
         js = ['js/admin_tooltips.js']
-
+    formfield_overrides = {
+        models.DateField: {'widget': DateInput(format='%Y-%m-%d', attrs={'type': 'date'})},
+    }
 class CleanHeaderMixin:
     """
     Mixin-only version that can be combined with any admin class
@@ -70,7 +74,7 @@ class CleanHeaderMixin:
 from .models import ThirdPartyVendor_B1_01_01
 @admin.register(ThirdPartyVendor_B1_01_01)
 class ThirdPartyVendorAdmin(CleanHeaderMixin, CustomAdmin):
-    list_display = ('lei', 'entity_name', 'entity_type')
+    list_display = ('lei', 'entity_name', )
     # search_fields = ('lei', 'entity_name')
     # list_filter = ('entity_type', 'country_code')
  
@@ -101,6 +105,7 @@ class ContractAgreementDetailsAdmin(CleanHeaderMixin, CustomAdmin):
     list_display = ('contract_reference_number', 'financial_entity_lei', 'tic_service_type', 'start_date', 'end_date')
     search_fields = ('contract_reference_number__contract_reference_number', 'financial_entity_lei__lei')
     list_filter = ('tic_service_type', 'data_retention', 'dependency_level')
+    readonly_fields=('vendor_code_type',)
 
 from .models import IntraGroupContractAgreement_B2_03
 @admin.register(IntraGroupContractAgreement_B2_03)
@@ -108,6 +113,7 @@ class IntraGroupContractAgreementAdmin(CleanHeaderMixin, CustomAdmin):
     list_display = ('contract_reference_number', 'linked_contract_reference')
     search_fields = ('contract_reference_number', 'linked_contract_reference__contract_reference_number')
     list_filter = ('contract_reference_number',)
+    
 
 from .models import ContractSigningEntity_B3_01
 @admin.register(ContractSigningEntity_B3_01)
@@ -122,6 +128,7 @@ class ThirdPartyVendorSigningAdmin(CleanHeaderMixin, CustomAdmin):
     list_display = ('contract_reference_number', 'third_party_vendor_code', 'vendor_code_type')
     search_fields = ('contract_reference_number__contract_reference_number', 'third_party_vendor_code')
     list_filter = ('contract_reference_number',)
+    readonly_fields = ('vendor_code_type',)
 
 from .models import FinancialEntityServiceProvider_B3_03
 @admin.register(FinancialEntityServiceProvider_B3_03)
@@ -172,6 +179,7 @@ class ServiceEvaluationAdmin(CleanHeaderMixin, CustomAdmin):
     list_display = ('contract_reference_number', 'vendor_code', 'tic_service_type', 'substitutability')
     search_fields = ('contract_reference_number__contract_reference_number', 'vendor_code__vendor_code')
     list_filter = ('tic_service_type', 'substitutability', 'impact')
+    readonly_fields = ('code_type','vendor_code',)
 
 from .models import Type_of_financial_entity
 @admin.register(Type_of_financial_entity)
@@ -184,3 +192,12 @@ from .models import Currency
 class CurrencyAdmin(CustomAdmin):
     list_display = ('name', 'symbol', 'numeric_code')
  
+from .models import ICTService
+@admin.register(ICTService)
+class ICTServiceAdmin(CustomAdmin):
+    list_display = ('service_id', 'service_type', 'description')
+    
+from .models import Authority
+@admin.register(Authority)
+class AuthorityAdmin(CustomAdmin):
+    list_display = ('code', 'description')
