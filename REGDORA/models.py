@@ -8,7 +8,7 @@ from .utils import validate_lei
 
 
 
-# Model for storing financial entity types
+# Model for storing Authorities 
 class Authority(models.Model):
     code = models.CharField(
         max_length=10,
@@ -22,6 +22,22 @@ class Authority(models.Model):
 
     def __str__(self):
         return f"{self.code} - {self.description}"
+
+# Model for storing Contract types 
+class Contract_types(models.Model):
+    code = models.CharField(
+        max_length=1,
+        verbose_name="Codice del tipo contratto",
+        unique=True,
+    )
+    description = models.CharField(
+        max_length=255,
+        verbose_name="Descrizione del tipo contratto",
+    )
+
+    def __str__(self):
+        return f"{self.code} - {self.description}"
+
 
 # Model for storing financial entity types
 class Type_of_financial_entity(models.Model):
@@ -239,7 +255,7 @@ class FinancialEntity_B1_02(models.Model):
 class Branch_B1_03(models.Model):
     # B_01.03.0010: Codice identificativo della succursale
     branch_code = models.CharField(
-        max_length=255,
+        max_length=20,
         verbose_name="Codice identificativo della succursale (B_01.03.0010)",
         help_text="Identificare una succursale di un'entità finanziaria situata al di fuori del paese d'origine utilizzando un codice univoco per ciascuna succursale.",
         unique=True,

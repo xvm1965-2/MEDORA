@@ -201,3 +201,8 @@ from .models import Authority
 @admin.register(Authority)
 class AuthorityAdmin(CustomAdmin):
     list_display = ('code', 'description')
+
+from .models import Contract_types
+@admin.register(Contract_types)
+class AuthorityAdmin(CustomAdmin):
+    list_display = ('code', 'description')
