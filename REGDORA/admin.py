@@ -81,7 +81,7 @@ class ThirdPartyVendorAdmin(CleanHeaderMixin, CustomAdmin):
 from .models import FinancialEntity_B1_02
 @admin.register(FinancialEntity_B1_02)
 class FinancialEntityAdmin(CleanHeaderMixin, CustomAdmin):
-    list_display = ('lei', 'entity_name', 'country_code', 'entity_type')
+    list_display = ('lei', 'entity_name', 'entity_type')
     # search_fields = ('lei', 'entity_name')
     # list_filter = ('entity_type', 'country_code')
    

@@ -2,6 +2,12 @@ from django.db import models
 from django_countries.fields import CountryField
 from django.core.exceptions import ValidationError
 
+import re
+from django.utils.translation import gettext_lazy as _
+from .utils import validate_lei
+
+
+
 # Model for storing financial entity types
 class Authority(models.Model):
     code = models.CharField(
@@ -66,6 +72,7 @@ class ThirdPartyVendor_B1_01_01(models.Model):
         verbose_name="LEI dell'entità finanziaria (B_01.01.0010)",
         help_text="Identificare l'entità finanziaria che mantiene e aggiorna il registro delle informazioni utilizzando il LEI, codice alfanumerico di 20 caratteri conforme alla norma ISO 17442.",
         unique=True,
+        validators=[validate_lei],  # Apply the custom validator
     )
 
     # B_01.01.0020: Name of the financial entity
@@ -125,6 +132,7 @@ class FinancialEntity_B1_02(models.Model):
         verbose_name="LEI dell'entità finanziaria (B_01.02.0010)",
         help_text="Identificare l'entità finanziaria segnalata nel registro delle informazioni utilizzando il LEI, codice alfanumerico di 20 caratteri conforme alla norma ISO 17442.",
         unique=True,
+        validators=[validate_lei],  # Apply the custom validator
     )
 
     # B_01.02.0020: Name of the financial entity
@@ -132,6 +140,8 @@ class FinancialEntity_B1_02(models.Model):
         max_length=255,
         verbose_name="Nome dell'entità finanziaria (B_01.02.0020)",
         help_text="Denominazione legale dell'entità finanziaria segnalata nel registro delle informazioni.",
+        null=False,
+        blank=False
     )
 
     # B_01.02.0030: Country of the financial entity
