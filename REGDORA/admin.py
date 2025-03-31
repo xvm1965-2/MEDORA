@@ -206,3 +206,18 @@ from .models import Contract_types
 @admin.register(Contract_types)
 class AuthorityAdmin(CustomAdmin):
     list_display = ('code', 'description')
+
+from .models import Dependency_levels
+@admin.register(Dependency_levels)
+class AuthorityAdmin(CustomAdmin):
+    list_display = ('code', 'description')
+
+from .models import Data_sensitivity
+@admin.register(Data_sensitivity)
+class AuthorityAdmin(CustomAdmin):
+    list_display = ('code', 'description')
+
+from .models import Termination_reasons
+@admin.register(Termination_reasons)
+class AuthorityAdmin(CustomAdmin):
+    list_display = ('code', 'description')

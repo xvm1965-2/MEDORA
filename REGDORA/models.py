@@ -39,6 +39,56 @@ class Contract_types(models.Model):
         return f"{self.code} - {self.description}"
 
 
+# Model for storing Contract types 
+class Data_sensitivity(models.Model):
+    code = models.CharField(
+        max_length=1,
+        verbose_name="Codice di sensibilità dei dati",
+        unique=True,
+    )
+    description = models.CharField(
+        max_length=255,
+        verbose_name="Descrizione del livello di sensibilità dei dati",
+    )
+
+    def __str__(self):
+        return f"{self.code} - {self.description}"
+
+# Model for storing Termination Contract Reasons 
+class Termination_reasons(models.Model):
+    code = models.CharField(
+        max_length=1,
+        verbose_name="Codice del motivo di chiusura del contratto",
+        unique=True,
+    )
+    description = models.CharField(
+        max_length=255,
+        verbose_name="Descrizione del motivo di chiusura del contratto",
+    )
+
+    def __str__(self):
+        return f"{self.code} - {self.description}"
+
+
+
+# Model for storing Dependency Levels 
+class Dependency_levels(models.Model):
+    code = models.CharField(
+        max_length=1,
+        verbose_name="Codice del livello di dipendenza",
+        unique=True,
+    )
+    description = models.CharField(
+        max_length=255,
+        verbose_name="Descrizione del livello di dipendenza",
+    )
+
+    def __str__(self):
+        return f"{self.code} - {self.description}"
+
+
+
+
 # Model for storing financial entity types
 class Type_of_financial_entity(models.Model):
     code = models.CharField(
@@ -301,18 +351,6 @@ class ContractAgreement_B2_01(models.Model):
     )
 
     # B_02.01.0020: Tipo di accordo contrattuale
-    CONTRACT_TYPE_CHOICES = [
-        ('1', "accordo autonomo"),
-        ('2', "accordo contrattuale generale/master"),
-        ('3', "accordo successivo o associato"),
-    ]
-    # contract_type = models.CharField(
-    #     max_length=1,
-    #     choices=CONTRACT_TYPE_CHOICES,
-    #     verbose_name="Tipo di accordo contrattuale (B_02.01.0020)",
-    #     help_text="Identificare il tipo di accordo contrattuale.",
-    # )
-
     contract_type = models.ForeignKey(
         'Contract_types',
         on_delete=models.PROTECT,
@@ -373,8 +411,8 @@ class ContractAgreementDetails_B2_02(models.Model):
         if value is not None and (value < 0 or value > 1460):
             raise ValidationError("Il termine di preavviso deve essere compreso tra 0 e 1460 giorni.")
 
-    # B_02.02.0010: Numero di riferimento dell'accordo contrattuale
-    contract_reference_number = models.ForeignKey(
+   # B_02.02.0010: Numero di riferimento dell'accordo contrattuale
+    contract_reference_number = models.OneToOneField(
         'ContractAgreement_B2_01',
         on_delete=models.CASCADE,
         verbose_name="Numero di riferimento dell'accordo contrattuale (B_02.02.0010)",
@@ -437,22 +475,30 @@ class ContractAgreementDetails_B2_02(models.Model):
     )
 
     # B_02.02.0090: Motivo della risoluzione o della fine dell'accordo contrattuale
-    TERMINATION_REASON_CHOICES = [
-        ('1', "risoluzione per scadenza naturale"),
-        ('2', "risoluzione per giusta causa (violazione di leggi/regolamenti)"),
-        ('3', "risoluzione per giusta causa (impedimenti del fornitore)"),
-        ('4', "risoluzione per giusta causa (gestione e sicurezza dei dati)"),
-        ('5', "risoluzione su richiesta di un'autorità competente"),
-        ('6', "altro"),
-    ]
-    termination_reason = models.CharField(
-        max_length=1,
-        choices=TERMINATION_REASON_CHOICES,
+    # TERMINATION_REASON_CHOICES = [
+    #     ('1', "risoluzione per scadenza naturale"),
+    #     ('2', "risoluzione per giusta causa (violazione di leggi/regolamenti)"),
+    #     ('3', "risoluzione per giusta causa (impedimenti del fornitore)"),
+    #     ('4', "risoluzione per giusta causa (gestione e sicurezza dei dati)"),
+    #     ('5', "risoluzione su richiesta di un'autorità competente"),
+    #     ('6', "altro"),
+    # ]
+    # termination_reason = models.CharField(
+    #     max_length=1,
+    #     choices=TERMINATION_REASON_CHOICES,
+    #     verbose_name="Motivo della risoluzione o della fine dell'accordo contrattuale (B_02.02.0090)",
+    #     help_text="Indicare il motivo della risoluzione o della fine dell'accordo contrattuale.",
+    #     blank=True,
+    #     null=True,
+    # )
+
+    termination_reason = models.ForeignKey(
+        'Termination_reasons',
+        on_delete=models.PROTECT,
         verbose_name="Motivo della risoluzione o della fine dell'accordo contrattuale (B_02.02.0090)",
         help_text="Indicare il motivo della risoluzione o della fine dell'accordo contrattuale.",
         blank=True,
-        null=True,
-    )
+        null=True,)
 
     # B_02.02.0100: Termine di preavviso per l'entità finanziaria
     financial_entity_notice_period = models.PositiveIntegerField(
@@ -513,30 +559,19 @@ class ContractAgreementDetails_B2_02(models.Model):
     )
 
     # B_02.02.0170: Sensibilità dei dati conservati dal fornitore terzo di servizi TIC
-    DATA_SENSITIVITY_CHOICES = [
-        ('1', "basso"),
-        ('2', "medio"),
-        ('3', "alto"),
-    ]
-    data_sensitivity = models.CharField(
-        max_length=1,
-        choices=DATA_SENSITIVITY_CHOICES,
+    data_sensitivity = models.ForeignKey(
+        'Data_sensitivity',
+        on_delete=models.PROTECT,
         verbose_name="Sensibilità dei dati conservati dal fornitore terzo di servizi TIC (B_02.02.0170)",
         help_text="Identificare il livello di sensibilità dei dati conservati o trattati dal fornitore terzo di servizi TIC.",
         blank=True,
         null=True,
     )
 
-    # B_02.02.0180: Livello di dipendenza dal servizio TIC che supporta la funzione essenziale o importante
-    DEPENDENCY_LEVEL_CHOICES = [
-        ('1', "dipendenza irrilevante"),
-        ('2', "dipendenza modesta"),
-        ('3', "dipendenza significativa"),
-        ('4', "dipendenza totale"),
-    ]
-    dependency_level = models.CharField(
-        max_length=1,
-        choices=DEPENDENCY_LEVEL_CHOICES,
+    # # B_02.02.0180: Livello di dipendenza dal servizio TIC che supporta la funzione essenziale o importante
+    dependency_level = models.ForeignKey(
+        'Dependency_levels',
+        on_delete=models.PROTECT,
         verbose_name="Livello di dipendenza dal servizio TIC (B_02.02.0180)",
         help_text="Utilizzare una delle opzioni indicate per il livello di dipendenza dal servizio TIC.",
     )
