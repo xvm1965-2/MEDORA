@@ -306,9 +306,16 @@ class ContractAgreement_B2_01(models.Model):
         ('2', "accordo contrattuale generale/master"),
         ('3', "accordo successivo o associato"),
     ]
-    contract_type = models.CharField(
-        max_length=1,
-        choices=CONTRACT_TYPE_CHOICES,
+    # contract_type = models.CharField(
+    #     max_length=1,
+    #     choices=CONTRACT_TYPE_CHOICES,
+    #     verbose_name="Tipo di accordo contrattuale (B_02.01.0020)",
+    #     help_text="Identificare il tipo di accordo contrattuale.",
+    # )
+
+    contract_type = models.ForeignKey(
+        'Contract_types',
+        on_delete=models.PROTECT,
         verbose_name="Tipo di accordo contrattuale (B_02.01.0020)",
         help_text="Identificare il tipo di accordo contrattuale.",
     )
@@ -343,7 +350,7 @@ class ContractAgreement_B2_01(models.Model):
     )
 
     def __str__(self):
-        return f"{self.contract_reference_number} - {self.get_contract_type_display()}"
+        return f"{self.contract_reference_number} - {self.general_contract_reference}"
 
     class Meta:
         db_table = "ContractAgreement-B2_01"

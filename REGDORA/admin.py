@@ -95,9 +95,9 @@ class BranchAdmin(CleanHeaderMixin, CustomAdmin):
 from .models import ContractAgreement_B2_01
 @admin.register(ContractAgreement_B2_01)
 class ContractAgreementAdmin(CleanHeaderMixin, CustomAdmin):
-    list_display = ('contract_reference_number', 'contract_type', 'currency', 'estimated_annual_cost')
+    list_display = ('contract_reference_number', 'general_contract_reference', 'contract_type')
     search_fields = ('contract_reference_number',)
-    list_filter = ('contract_type', 'currency')
+    list_filter = ('contract_type', 'general_contract_reference')
 
 from .models import ContractAgreementDetails_B2_02
 @admin.register(ContractAgreementDetails_B2_02)
