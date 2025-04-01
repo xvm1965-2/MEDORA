@@ -1,5 +1,8 @@
 {% extends "admin/index.html" %}
 
+<h1>Welcome</h1>
+<p>User Group Family: {{ group_family }}</p>
+
 {% block content %}
 <div id="content-main">
     <!-- Section 1: Entities -->
@@ -151,10 +154,18 @@
                 <td><a href="{% url 'admin:REGDORA_termination_reasons_add' %}" class="addlink">Add</a></td>
                 <td><a href="{% url 'admin:REGDORA_termination_reasons_changelist' %}" class="changelink">Change</a></td>
             </tr>
+            <tr>
+                <th scope="row"><a href="{% url 'admin:REGDORA_vendor_code_type_changelist' %}">Vendor Code Type</a></th>
+                <td><a href="{% url 'admin:REGDORA_vendor_code_type_add' %}" class="addlink">Add</a></td>
+                <td><a href="{% url 'admin:REGDORA_vendor_code_type_changelist' %}" class="changelink">Change</a></td>
+            </tr>
+
         </table>
     </div>
-
+    
+    
     <!-- Section 7: Administration -->
+    
     <div class="module">
         <table>
             <caption>7 - ADMINISTRATION</caption>

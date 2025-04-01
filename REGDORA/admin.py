@@ -165,6 +165,7 @@ class SupplyChainAdmin(CleanHeaderMixin, CustomAdmin):
         'recipient_code',
     )
     list_filter = ('tic_service_type', 'position')
+    readonly_fields=('code_type','recipient_code_type' )
 
 from .models import FunctionIdentification_B6_01
 @admin.register(FunctionIdentification_B6_01)
@@ -219,5 +220,10 @@ class AuthorityAdmin(CustomAdmin):
 
 from .models import Termination_reasons
 @admin.register(Termination_reasons)
+class AuthorityAdmin(CustomAdmin):
+    list_display = ('code', 'description')
+
+from .models import Vendor_code_type
+@admin.register(Vendor_code_type)
 class AuthorityAdmin(CustomAdmin):
     list_display = ('code', 'description')

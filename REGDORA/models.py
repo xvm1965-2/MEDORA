@@ -38,7 +38,6 @@ class Contract_types(models.Model):
     def __str__(self):
         return f"{self.code} - {self.description}"
 
-
 # Model for storing Contract types 
 class Data_sensitivity(models.Model):
     code = models.CharField(
@@ -69,8 +68,6 @@ class Termination_reasons(models.Model):
     def __str__(self):
         return f"{self.code} - {self.description}"
 
-
-
 # Model for storing Dependency Levels 
 class Dependency_levels(models.Model):
     code = models.CharField(
@@ -85,9 +82,6 @@ class Dependency_levels(models.Model):
 
     def __str__(self):
         return f"{self.code} - {self.description}"
-
-
-
 
 # Model for storing financial entity types
 class Type_of_financial_entity(models.Model):
@@ -108,6 +102,26 @@ class Type_of_financial_entity(models.Model):
         db_table = "Type_of_financial_entity"
         verbose_name = "Type of Financial Entity"
         verbose_name_plural = "Types of Financial Entities"
+
+#Model for vendor code type
+class Vendor_code_type(models.Model):
+    code = models.CharField(
+        max_length=5,
+        verbose_name="Codice della tipologia del codice identificativo del fornitore",
+        unique=True,
+    )
+    description = models.CharField(
+        max_length=255,
+        verbose_name="Descrizione della tipologia del codice identificativo del fornitore",
+    )
+
+    def __str__(self):
+        return f"{self.code} - {self.description}"
+
+    class Meta:
+        db_table = "Vendor_code_type"
+        verbose_name = "Vendor code type"
+        verbose_name_plural = "Types of vendor code"
 
 class Currency(models.Model):
     code = models.CharField(max_length=3, primary_key=True, verbose_name="ISO 4217 Code")
@@ -327,10 +341,11 @@ class Branch_B1_03(models.Model):
     )
 
     # B_01.03.0040: Paese della succursale
-    branch_country = models.CharField(
-        max_length=2,
+    branch_country =  CountryField(
         verbose_name="Paese della succursale (B_01.03.0040)",
         help_text="Indicare il codice ISO 3166-1 alpha-2 del paese in cui la succursale è ubicata.",
+        blank=False,
+        null=False,
     )
 
     def __str__(self):
@@ -398,14 +413,14 @@ class ContractAgreement_B2_01(models.Model):
 class ContractAgreementDetails_B2_02(models.Model):
     
     # Code type choices for the vendor code type
-    CODE_TYPE_CHOICES = [
-        ('LEI', "LEI"),
-        ('EUID', "EUID"),
-        ('CRN', "CRN (Codice di Registrazione delle Imprese)"),
-        ('IVA', "IVA (Partita IVA)"),
-        ('PNR', "PNR (Numero di Passaporto)"),
-        ('NIN', "NIN (Numero di Identità Nazionale)"),
-    ]
+    # CODE_TYPE_CHOICES = [
+    #     ('LEI', "LEI"),
+    #     ('EUID', "EUID"),
+    #     ('CRN', "CRN (Codice di Registrazione delle Imprese)"),
+    #     ('IVA', "IVA (Partita IVA)"),
+    #     ('PNR', "PNR (Numero di Passaporto)"),
+    #     ('NIN', "NIN (Numero di Identità Nazionale)"),
+    # ]
 
     def validate_notice_period(value):
         if value is not None and (value < 0 or value > 1460):
@@ -437,17 +452,29 @@ class ContractAgreementDetails_B2_02(models.Model):
         help_text="Codice per identificare il fornitore terzo di servizi TIC.",
     )
 
-    # B_02.02.0040: Tipo di codice per identificare il fornitore terzo di servizi TIC
-    vendor_code_type = models.CharField(
-        choices=CODE_TYPE_CHOICES,
-        max_length=255,
+    # B_02.02.0040: Tipo di codice per identificare il fornitore terzo di servizi TIC --- determinato dal vendor code --- da eliminare
+    # vendor_code_type = models.CharField(
+    #     choices=CODE_TYPE_CHOICES,
+    #     max_length=255,
+    #     verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_02.02.0040)",
+    #     help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
+    # )
+
+    vendor_code_type = models.ForeignKey(
+        'Vendor_code_type',
+        on_delete=models.PROTECT,
         verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_02.02.0040)",
         help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
+        null=False,
+        blank=False,
+        related_name="Code_type_for_vendor_in_02_02",
     )
 
+
     # B_02.02.0050: Identificativo della funzione
-    function_identifier = models.CharField(
-        max_length=255,
+    function_identifier = models.ForeignKey(
+        'FunctionIdentification_B6_01',
+        on_delete=models.PROTECT,
         verbose_name="Identificativo della funzione (B_02.02.0050)",
         help_text="Identificativo della funzione come definito dall'entità finanziaria.",
     )
@@ -461,7 +488,6 @@ class ContractAgreementDetails_B2_02(models.Model):
         related_name="ICT_Service_Type",
     )
     
-
     # B_02.02.0070: Data di inizio dell'accordo contrattuale
     start_date = models.DateField(
         verbose_name="Data di inizio dell'accordo contrattuale (B_02.02.0070)",
@@ -475,30 +501,14 @@ class ContractAgreementDetails_B2_02(models.Model):
     )
 
     # B_02.02.0090: Motivo della risoluzione o della fine dell'accordo contrattuale
-    # TERMINATION_REASON_CHOICES = [
-    #     ('1', "risoluzione per scadenza naturale"),
-    #     ('2', "risoluzione per giusta causa (violazione di leggi/regolamenti)"),
-    #     ('3', "risoluzione per giusta causa (impedimenti del fornitore)"),
-    #     ('4', "risoluzione per giusta causa (gestione e sicurezza dei dati)"),
-    #     ('5', "risoluzione su richiesta di un'autorità competente"),
-    #     ('6', "altro"),
-    # ]
-    # termination_reason = models.CharField(
-    #     max_length=1,
-    #     choices=TERMINATION_REASON_CHOICES,
-    #     verbose_name="Motivo della risoluzione o della fine dell'accordo contrattuale (B_02.02.0090)",
-    #     help_text="Indicare il motivo della risoluzione o della fine dell'accordo contrattuale.",
-    #     blank=True,
-    #     null=True,
-    # )
-
     termination_reason = models.ForeignKey(
         'Termination_reasons',
         on_delete=models.PROTECT,
         verbose_name="Motivo della risoluzione o della fine dell'accordo contrattuale (B_02.02.0090)",
         help_text="Indicare il motivo della risoluzione o della fine dell'accordo contrattuale.",
         blank=True,
-        null=True,)
+        null=True,
+    )
 
     # B_02.02.0100: Termine di preavviso per l'entità finanziaria
     financial_entity_notice_period = models.PositiveIntegerField(
@@ -654,12 +664,23 @@ class ThirdPartyVendorSigning_B3_02(models.Model):
     )
 
     # B_03.02.0030: Tipo di codice per identificare il fornitore terzo di servizi TIC
-    vendor_code_type = models.CharField(
-        choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
-        max_length=255,
-        verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_03.02.0030)",
-        help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
-    )
+    # vendor_code_type = models.CharField(
+    #     choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    #     max_length=255,
+    #     verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_03.02.0030)",
+    #     help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
+    # )
+
+    vendor_code_type = models.ForeignKey(
+            'Vendor_code_type',
+            on_delete=models.PROTECT,
+            verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_03.02.0030)",
+            help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
+            null=False,
+            blank=False,
+            related_name='Vendor_code_type_for_03_02',
+
+        )
 
     def save(self, *args, **kwargs):
         # Automatically set the vendor_code_type to the code_type of the related third_party_vendor_code
@@ -721,14 +742,30 @@ class FinancialEntityServiceUsage_B4_01(models.Model):
         help_text="Utilizzare una delle opzioni indicate per la natura dell'entità finanziaria.",
     )
 
+    # # B_04.01.0040: Codice identificativo della succursale
+    # branch_code = models.CharField(
+    #     max_length=255,
+    #     verbose_name="Codice identificativo della succursale (B_04.01.0040)",
+    #     help_text="Codice identificativo della succursale segnalato in B_01.03.0010.",
+    #     blank=True,
+    #     null=True,
+    # )
     # B_04.01.0040: Codice identificativo della succursale
-    branch_code = models.CharField(
-        max_length=255,
+    branch_code = models.ForeignKey(
+        'Branch_B1_03',
+        on_delete=models.CASCADE,
         verbose_name="Codice identificativo della succursale (B_04.01.0040)",
         help_text="Codice identificativo della succursale segnalato in B_01.03.0010.",
         blank=True,
         null=True,
     )
+
+    def clean(self):
+        super().clean()
+        if self.entity_nature == '1' and not self.branch_code:
+            raise ValidationError({'branch_code': "Questo campo è obbligatorio quando la natura dell'entità è '1' (succursale)."})
+        if self.entity_nature != '1' and self.branch_code:
+            raise ValidationError({'branch_code': "Non è possibile specificare un codice succursale se l'entità non è una succursale."})
 
 class ThirdPartyVendor_B5_01(models.Model):
     # B_05.01.0010: Codice identificativo del fornitore terzo di servizi TIC
@@ -739,13 +776,25 @@ class ThirdPartyVendor_B5_01(models.Model):
         unique=True,
     )
 
+   
     # B_05.01.0020: Tipo di codice per identificare il fornitore terzo di servizi TIC
-    code_type = models.CharField(
-        max_length=4,
-        choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    # code_type = models.CharField(
+    #     max_length=4,
+    #     # choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    #     verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_05.01.0020)",
+    #     help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
+    # )
+
+    code_type = models.ForeignKey(
+        'Vendor_code_type',
+        on_delete=models.PROTECT,
+        null=False,
+        blank=False,
         verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_05.01.0020)",
         help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
+        related_name='Vendor_code_type_for_05_01_0020',
     )
+
 
     # B_05.01.0030: Codice identificativo aggiuntivo del fornitore terzo di servizi TIC
     additional_vendor_code = models.CharField(
@@ -754,16 +803,27 @@ class ThirdPartyVendor_B5_01(models.Model):
         help_text="Codice aggiuntivo per identificare il fornitore terzo di servizi TIC, ove disponibile.",
         blank=True,
         null=True,
+        
     )
 
     # B_05.01.0040: Tipo di codice identificativo aggiuntivo per identificare il fornitore terzo di servizi TIC
-    additional_code_type = models.CharField(
-        max_length=4,
-        choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    # additional_code_type = models.CharField(
+    #     max_length=4,
+    #     # choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    #     verbose_name="Tipo di codice identificativo aggiuntivo per identificare il fornitore terzo di servizi TIC (B_05.01.0040)",
+    #     help_text="Tipo di codice identificativo aggiuntivo per identificare il fornitore terzo di servizi TIC.",
+    #     blank=True,
+    #     null=True,
+    # )
+
+    additional_code_type = models.ForeignKey(
+        'Vendor_code_type',
+        on_delete=models.PROTECT,
         verbose_name="Tipo di codice identificativo aggiuntivo per identificare il fornitore terzo di servizi TIC (B_05.01.0040)",
         help_text="Tipo di codice identificativo aggiuntivo per identificare il fornitore terzo di servizi TIC.",
         blank=True,
         null=True,
+        related_name='Vendor_code_type_for_05010040',
     )
 
     # B_05.01.0050: Denominazione legale del fornitore terzo di servizi TIC
@@ -800,7 +860,7 @@ class ThirdPartyVendor_B5_01(models.Model):
     )
 
     def __str__(self):
-        return f"{self.vendor_code} - {self.legal_name}"
+        return f"{self.vendor_code} - {self.latin_name}"
 
     class Meta:
         db_table = "ThirdPartyVendor-B5_01"
@@ -830,12 +890,19 @@ class SupplyChain_B5_02(models.Model):
         help_text="Come segnalato in B_05.01.0010 per tale fornitore terzo di servizi TIC.",
     )
 
-    code_type = models.CharField(
-        max_length=4,
-        choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    # code_type = models.CharField(
+    #     max_length=4,
+    #     choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    #     verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_05.02.0040)",
+    #     help_text="Come segnalato in B_05.01.0020 per tale fornitore terzo di servizi TIC.",
+    # )
+    code_type = models.ForeignKey(
+        'Vendor_code_type',
+        on_delete=models.PROTECT,
         verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_05.02.0040)",
         help_text="Come segnalato in B_05.01.0020 per tale fornitore terzo di servizi TIC.",
     )
+
 
     position = models.PositiveIntegerField(
         verbose_name="Posizione (B_05.02.0050)",
@@ -850,26 +917,56 @@ class SupplyChain_B5_02(models.Model):
         null=True,
     )
 
-    recipient_code_type = models.CharField(
-        max_length=4,
-        choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    # recipient_code_type = models.CharField(
+    #     max_length=4,
+    #     choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    #     verbose_name="Tipo di codice per identificare il destinatario dei servizi TIC subappaltati (B_05.02.0070)",
+    #     help_text="Tipo di codice per identificare il destinatario dei servizi TIC subappaltati.",
+    #     blank=True,
+    #     null=True,
+    # )
+    recipient_code_type = models.ForeignKey(
+        'Vendor_code_type',
+        on_delete=models.PROTECT,
         verbose_name="Tipo di codice per identificare il destinatario dei servizi TIC subappaltati (B_05.02.0070)",
         help_text="Tipo di codice per identificare il destinatario dei servizi TIC subappaltati.",
         blank=True,
         null=True,
+        related_name = "Vendor_code_recipient",
     )
+
 
     class Meta:
         db_table = "SupplyChain-B5_02"
         verbose_name = "Supply Chain (B5_02)"
         verbose_name_plural = "Supply Chains (B5_02)"
 
+    def save(self, *args, **kwargs):
+        """Automatically set code_type and recipient_code_type before saving."""
+        # Set code_type from the related vendor_code
+        if self.vendor_code and self.vendor_code.code_type:
+            self.code_type = self.vendor_code.code_type
+
+        # Set recipient_code_type from the related ThirdPartyVendor_B5_01 based on recipient_code
+        if self.recipient_code:
+            try:
+                related_vendor = ThirdPartyVendor_B5_01.objects.get(vendor_code=self.recipient_code)
+                self.recipient_code_type = related_vendor.code_type
+            except ThirdPartyVendor_B5_01.DoesNotExist:
+                pass  # If no related vendor is found, keep recipient_code_type as None
+
 class FunctionIdentification_B6_01(models.Model):
+    def validate_function_id(value):
+        """Ensure function_id starts with 'F' followed by a natural number."""
+        if not re.match(r'^F\d+$', value):
+            raise ValidationError("function_id must start with 'F' followed by a natural number.")
+    
     function_id = models.CharField(
         max_length=255,
         verbose_name="Identificativo della funzione (B_06.01.0010)",
         help_text="Identificativo della funzione univoco.",
         unique=True,
+        validators=[validate_function_id]
     )
 
     AUTHORIZED_ACTIVITY_CHOICES = [
@@ -947,6 +1044,11 @@ class FunctionIdentification_B6_01(models.Model):
         db_table = "FunctionIdentification-B6_01"
         verbose_name = "Function Identification (B6_01)"
         verbose_name_plural = "Function Identifications (B6_01)"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['financial_entity_lei', 'function_name', 'authorized_activity'],
+                name='unique_financial_entity_function_activity'
+            ),]
 
 class ServiceEvaluation_B7_01(models.Model):
     # B_07.01.0010: Numero di riferimento dell'accordo contrattuale
@@ -966,11 +1068,19 @@ class ServiceEvaluation_B7_01(models.Model):
     )
 
     # B_07.01.0030: Tipo di codice per identificare il fornitore terzo di servizi TIC
-    code_type = models.CharField(
-        max_length=4,
-        choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    # code_type = models.CharField(
+    #     max_length=4,
+    #     choices=ContractAgreementDetails_B2_02.CODE_TYPE_CHOICES,
+    #     verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_07.01.0030)",
+    #     help_text="Come segnalato in B_05.01.0020.",
+    # )
+
+    code_type = models.ForeignKey(
+        'Vendor_code_type',
+        on_delete=models.PROTECT,
         verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_07.01.0030)",
         help_text="Come segnalato in B_05.01.0020.",
+        related_name="Vendor_code_type_for_07_01",
     )
 
    # B_07.01.0040: Tipo di servizi TIC
