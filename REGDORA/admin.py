@@ -105,7 +105,11 @@ class ContractAgreementDetailsAdmin(CleanHeaderMixin, CustomAdmin):
     list_display = ('contract_reference_number', 'financial_entity_lei', 'tic_service_type', 'start_date', 'end_date')
     search_fields = ('contract_reference_number__contract_reference_number', 'financial_entity_lei__lei')
     list_filter = ('tic_service_type', 'data_retention', 'dependency_level')
-    readonly_fields=('vendor_code_type',)
+    readonly_fields=('display_vendor_code_type',)
+
+    def display_vendor_code_type(self, obj):
+        return obj.vendor_code_type  # Calls the @property method
+    display_vendor_code_type.short_description = "Vendor Code Type"  # Column name in Django Admin
 
 from .models import IntraGroupContractAgreement_B2_03
 @admin.register(IntraGroupContractAgreement_B2_03)
@@ -125,10 +129,14 @@ class ContractSigningEntityAdmin(CleanHeaderMixin, CustomAdmin):
 from .models import ThirdPartyVendorSigning_B3_02
 @admin.register(ThirdPartyVendorSigning_B3_02)
 class ThirdPartyVendorSigningAdmin(CleanHeaderMixin, CustomAdmin):
-    list_display = ('contract_reference_number', 'third_party_vendor_code', 'vendor_code_type')
+    list_display = ('contract_reference_number', 'third_party_vendor_code', 'display_vendor_code_type')
     search_fields = ('contract_reference_number__contract_reference_number', 'third_party_vendor_code')
     list_filter = ('contract_reference_number',)
-    readonly_fields = ('vendor_code_type',)
+    readonly_fields = ('display_vendor_code_type',)
+
+    def display_vendor_code_type(self, obj):
+        return obj.vendor_code_type  # Calls the @property method
+    display_vendor_code_type.short_description = "Vendor Code Type"  # Column name in Django Admin
 
 from .models import FinancialEntityServiceProvider_B3_03
 @admin.register(FinancialEntityServiceProvider_B3_03)
@@ -151,7 +159,7 @@ class FinancialEntityServiceUsageAdmin(CleanHeaderMixin, CustomAdmin):
 from .models import ThirdPartyVendor_B5_01
 @admin.register(ThirdPartyVendor_B5_01)
 class ThirdPartyVendorAdmin(CleanHeaderMixin, CustomAdmin):
-    list_display = ('vendor_code', 'code_type', 'legal_name', 'vendor_type', 'headquarters_country')
+    list_display = ('vendor_code', 'legal_name', 'vendor_type', 'headquarters_country')
     search_fields = ('vendor_code', 'legal_name', 'latin_name', 'headquarters_country')
     list_filter = ('code_type', 'vendor_type', 'headquarters_country')
 
@@ -165,7 +173,16 @@ class SupplyChainAdmin(CleanHeaderMixin, CustomAdmin):
         'recipient_code',
     )
     list_filter = ('tic_service_type', 'position')
-    readonly_fields=('code_type','recipient_code_type' )
+    readonly_fields=('display_code_type','display_recipient_code_type' )
+
+    def display_code_type(self, obj):
+            return obj.code_type  # Calls the @property method
+    display_code_type.short_description = "Vendor Code Type"  # Column name in Django Admin
+    
+    def display_recipient_code_type(self, obj):
+            return obj.recipient_code_type  # Calls the @property method
+    display_recipient_code_type.short_description = "Recipient Vendor Code Type"  # Column name in Django Admin
+
 
 from .models import FunctionIdentification_B6_01
 @admin.register(FunctionIdentification_B6_01)

@@ -460,16 +460,19 @@ class ContractAgreementDetails_B2_02(models.Model):
     #     help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
     # )
 
-    vendor_code_type = models.ForeignKey(
-        'Vendor_code_type',
-        on_delete=models.PROTECT,
-        verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_02.02.0040)",
-        help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
-        null=False,
-        blank=False,
-        related_name="Code_type_for_vendor_in_02_02",
-    )
+    # vendor_code_type = models.ForeignKey(
+    #     'Vendor_code_type',
+    #     on_delete=models.PROTECT,
+    #     verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_02.02.0040)",
+    #     help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
+    #     null=False,
+    #     blank=False,
+    #     related_name="Code_type_for_vendor_in_02_02",
+    # )
 
+    @property
+    def vendor_code_type(self):
+        return self.third_party_vendor_code.code_type if self.third_party_vendor_code else None
 
     # B_02.02.0050: Identificativo della funzione
     function_identifier = models.ForeignKey(
@@ -589,12 +592,12 @@ class ContractAgreementDetails_B2_02(models.Model):
     def __str__(self):
         return f"{self.contract_reference_number} - {self.financial_entity_lei}"
 
-    def save(self, *args, **kwargs):
-        # Automatically set vendor_code_type based on the related ThirdPartyVendor_B5_01 code_type
-        if self.third_party_vendor_code:
-            self.vendor_code_type = self.third_party_vendor_code.code_type
+    # def save(self, *args, **kwargs):
+    #     # Automatically set vendor_code_type based on the related ThirdPartyVendor_B5_01 code_type
+    #     if self.third_party_vendor_code:
+    #         self.vendor_code_type = self.third_party_vendor_code.code_type
         
-        super(ContractAgreementDetails_B2_02, self).save(*args, **kwargs)
+    #     super(ContractAgreementDetails_B2_02, self).save(*args, **kwargs)
 
 
     class Meta:
@@ -671,22 +674,27 @@ class ThirdPartyVendorSigning_B3_02(models.Model):
     #     help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
     # )
 
-    vendor_code_type = models.ForeignKey(
-            'Vendor_code_type',
-            on_delete=models.PROTECT,
-            verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_03.02.0030)",
-            help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
-            null=False,
-            blank=False,
-            related_name='Vendor_code_type_for_03_02',
+    # vendor_code_type = models.ForeignKey(
+    #         'Vendor_code_type',
+    #         on_delete=models.PROTECT,
+    #         verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_03.02.0030)",
+    #         help_text="Tipo di codice per identificare il fornitore terzo di servizi TIC.",
+    #         null=False,
+    #         blank=False,
+    #         related_name='Vendor_code_type_for_03_02',
 
-        )
+    #     )
 
-    def save(self, *args, **kwargs):
-        # Automatically set the vendor_code_type to the code_type of the related third_party_vendor_code
-        if self.third_party_vendor_code:
-            self.vendor_code_type = self.third_party_vendor_code.code_type
-        super().save(*args, **kwargs)
+    @property
+    def vendor_code_type(self):
+        return self.third_party_vendor_code.code_type if self.third_party_vendor_code else None
+
+
+    # def save(self, *args, **kwargs):
+    #     # Automatically set the vendor_code_type to the code_type of the related third_party_vendor_code
+    #     if self.third_party_vendor_code:
+    #         self.vendor_code_type = self.third_party_vendor_code.code_type
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.contract_reference_number} - {self.third_party_vendor_code.vendor_code}"
@@ -888,6 +896,7 @@ class SupplyChain_B5_02(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Codice identificativo del fornitore terzo di servizi TIC (B_05.02.0030)",
         help_text="Come segnalato in B_05.01.0010 per tale fornitore terzo di servizi TIC.",
+        related_name="supply_chain_vendor_codes",
     )
 
     # code_type = models.CharField(
@@ -896,25 +905,39 @@ class SupplyChain_B5_02(models.Model):
     #     verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_05.02.0040)",
     #     help_text="Come segnalato in B_05.01.0020 per tale fornitore terzo di servizi TIC.",
     # )
-    code_type = models.ForeignKey(
-        'Vendor_code_type',
-        on_delete=models.PROTECT,
-        verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_05.02.0040)",
-        help_text="Come segnalato in B_05.01.0020 per tale fornitore terzo di servizi TIC.",
-    )
-
+    # code_type = models.ForeignKey(
+    #     'Vendor_code_type',
+    #     on_delete=models.PROTECT,
+    #     verbose_name="Tipo di codice per identificare il fornitore terzo di servizi TIC (B_05.02.0040)",
+    #     help_text="Come segnalato in B_05.01.0020 per tale fornitore terzo di servizi TIC.",
+    # )
+    
+    @property
+    def code_type(self):
+        """Returns the code_type of the related vendor_code."""
+        return self.vendor_code.code_type if self.vendor_code else None
 
     position = models.PositiveIntegerField(
         verbose_name="Posizione (B_05.02.0050)",
         help_text="Posizione del fornitore terzo di servizi TIC nella catena di approvvigionamento.",
     )
 
-    recipient_code = models.CharField(
-        max_length=255,
+    # recipient_code = models.CharField(
+    #     max_length=255,
+    #     verbose_name="Codice identificativo del destinatario dei servizi TIC subappaltati (B_05.02.0060)",
+    #     help_text="Codice identificativo del destinatario dei servizi TIC subappaltati.",
+    #     blank=True,
+    #     null=True,
+    # )
+
+    recipient_code = models.ForeignKey(
+        'ThirdPartyVendor_B5_01',
+        on_delete=models.CASCADE,
         verbose_name="Codice identificativo del destinatario dei servizi TIC subappaltati (B_05.02.0060)",
         help_text="Codice identificativo del destinatario dei servizi TIC subappaltati.",
         blank=True,
         null=True,
+        related_name="supply_chain_recipient_codes",
     )
 
     # recipient_code_type = models.CharField(
@@ -925,35 +948,44 @@ class SupplyChain_B5_02(models.Model):
     #     blank=True,
     #     null=True,
     # )
-    recipient_code_type = models.ForeignKey(
-        'Vendor_code_type',
-        on_delete=models.PROTECT,
-        verbose_name="Tipo di codice per identificare il destinatario dei servizi TIC subappaltati (B_05.02.0070)",
-        help_text="Tipo di codice per identificare il destinatario dei servizi TIC subappaltati.",
-        blank=True,
-        null=True,
-        related_name = "Vendor_code_recipient",
-    )
-
+    # recipient_code_type = models.ForeignKey(
+    #     'Vendor_code_type',
+    #     on_delete=models.PROTECT,
+    #     verbose_name="Tipo di codice per identificare il destinatario dei servizi TIC subappaltati (B_05.02.0070)",
+    #     help_text="Tipo di codice per identificare il destinatario dei servizi TIC subappaltati.",
+    #     blank=True,
+    #     null=True,
+    #     related_name = "Vendor_code_recipient",
+    # )
+    @property
+    def recipient_code_type(self):
+        """Returns the code_type of the related recipient_code if it exists in ThirdPartyVendor_B5_01."""
+        if self.recipient_code:
+            try:
+                # related_vendor = ThirdPartyVendor_B5_01.objects.get(vendor_code=self.recipient_code)
+                return self.recipient_code.code_type.code_type
+            except ThirdPartyVendor_B5_01.DoesNotExist:
+                return None  # If no related vendor is found, return None
+        return None
 
     class Meta:
         db_table = "SupplyChain-B5_02"
         verbose_name = "Supply Chain (B5_02)"
         verbose_name_plural = "Supply Chains (B5_02)"
 
-    def save(self, *args, **kwargs):
-        """Automatically set code_type and recipient_code_type before saving."""
-        # Set code_type from the related vendor_code
-        if self.vendor_code and self.vendor_code.code_type:
-            self.code_type = self.vendor_code.code_type
+    # def save(self, *args, **kwargs):
+    #     """Automatically set code_type and recipient_code_type before saving."""
+    #     # Set code_type from the related vendor_code
+    #     if self.vendor_code and self.vendor_code.code_type:
+    #         self.code_type = self.vendor_code.code_type
 
-        # Set recipient_code_type from the related ThirdPartyVendor_B5_01 based on recipient_code
-        if self.recipient_code:
-            try:
-                related_vendor = ThirdPartyVendor_B5_01.objects.get(vendor_code=self.recipient_code)
-                self.recipient_code_type = related_vendor.code_type
-            except ThirdPartyVendor_B5_01.DoesNotExist:
-                pass  # If no related vendor is found, keep recipient_code_type as None
+    #     # Set recipient_code_type from the related ThirdPartyVendor_B5_01 based on recipient_code
+    #     if self.recipient_code:
+    #         try:
+    #             related_vendor = ThirdPartyVendor_B5_01.objects.get(vendor_code=self.recipient_code)
+    #             self.recipient_code_type = related_vendor.code_type
+    #         except ThirdPartyVendor_B5_01.DoesNotExist:
+    #             pass  # If no related vendor is found, keep recipient_code_type as None
 
 class FunctionIdentification_B6_01(models.Model):
     def validate_function_id(value):
